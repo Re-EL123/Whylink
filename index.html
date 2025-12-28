@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>B Re-EL | Secure E-Wallet</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0b5d3b" />
+  <meta name="description" content="B Re-EL Secure E-Wallet for South Africa. Deposit, withdraw and manage your money safely." />
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icon-192.png" />
+
+  <!-- React CDN -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: linear-gradient(135deg, #0a1a2f, #0b5d3b);
+      color: #ffffff;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .splash {
+      text-align: center;
+      max-width: 420px;
+      padding: 40px 25px;
+      animation: fadeIn 1.2s ease-in-out;
+    }
+
+    .logo {
+      font-size: 2.6rem;
+      font-weight: 800;
+      color: #d4af37;
+      letter-spacing: 1px;
+    }
+
+    .subtitle {
+      margin-top: 12px;
+      font-size: 1rem;
+      opacity: 0.9;
+    }
+
+    .balance-preview {
+      margin: 30px 0;
+      background: rgba(255, 255, 255, 0.08);
+      padding: 18px;
+      border-radius: 14px;
+      border: 1px solid rgba(212, 175, 55, 0.35);
+    }
+
+    .balance-label {
+      font-size: 0.85rem;
+      opacity: 0.8;
+    }
+
+    .balance-amount {
+      font-size: 1.8rem;
+      font-weight: bold;
+      margin-top: 6px;
+      color: #d4af37;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 14px;
+      margin-top: 12px;
+      border-radius: 10px;
+      border: none;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+
+    .btn-primary {
+      background: #d4af37;
+      color: #0a1a2f;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: #ffffff;
+      border: 1px solid #d4af37;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      opacity: 0.95;
+    }
+
+    .footer-text {
+      margin-top: 30px;
+      font-size: 0.75rem;
+      opacity: 0.65;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="root"></div>
+
+  <!-- React App -->
+  <script type="text/babel">
+    function App() {
+      return (
+        <div className="splash">
+          <div className="logo">B Re-EL</div>
+          <div className="subtitle">
+            Secure South African E-Wallet
+          </div>
+
+          <div className="balance-preview">
+            <div className="balance-label">Wallet Balance</div>
+            <div className="balance-amount">R0.00</div>
+          </div>
+
+          <button
+            className="btn btn-primary"
+            onClick={() => window.location.href = "signup.html"}
+          >
+            Create Account
+          </button>
+
+          <button
+            className="btn btn-secondary"
+            onClick={() => window.location.href = "login.html"}
+          >
+            Login to Wallet
+          </button>
+
+          <div className="footer-text">
+            Protected • Trusted • Powered for South Africa 🇿🇦
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+  </script>
+
+  <!-- Service Worker -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('service-worker.js');
+      });
+    }
+  </script>
+</body>
+</html>
