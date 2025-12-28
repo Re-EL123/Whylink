@@ -143,47 +143,75 @@
 <body>
   <div id="root"></div>
 
-  <script type="text/babel">
-    function Signup() {
-      const [form, setForm] = React.useState({});
-      const [step, setStep] = React.useState("signup");
-      const [confirmationResult, setConfirmationResult] = React.useState(null);
-      const [agreeTerms, setAgreeTerms] = React.useState(false);
-      const [agreePrivacy, setAgreePrivacy] = React.useState(false);
+ <script type="text/babel">
+function Signup() {
+  const [form, setForm] = React.useState({});
+  const [step, setStep] = React.useState("signup");
+  const [confirmationResult, setConfirmationResult] = React.useState(null);
+  const [agreeTerms, setAgreeTerms] = React.useState(false);
+  const [agreePrivacy, setAgreePrivacy] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
 
-      const handleChange = e =>
-        setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = e =>
+    setForm({ ...form, [e.target.name]: e.target.value });
 
-      const handleTerms = () => setAgreeTerms(!agreeTerms);
-      const handlePrivacy = () => setAgreePrivacy(!agreePrivacy);
+  const handleTerms = () => setAgreeTerms(!agreeTerms);
+  const handlePrivacy = () => setAgreePrivacy(!agreePrivacy);
 
-      const register = async () => {
-        if (!agreeTerms) { alert("You must agree to the Terms."); return; }
-        if (!agreePrivacy) { alert("You must agree to the Privacy Policy."); return; }
-        if (form.password !== form.confirmPassword) {
-          alert("Passwords do not match");
-          return;
-        }
+  const register = async () => {
+    if (!agreeTerms) { alert("You must agree to the Terms."); return; }
+    if (!agreePrivacy) { alert("You must agree to the Privacy Policy."); return; }
+    if (!form.email) { alert("Please enter your email."); return; }
+    if (!form.password || !form.confirmPassword) { alert("Please enter and confirm your password."); return; }
+    if (form.password !== form.confirmPassword) {
+      alert("Passwords do not match");
+      return;
+    }
 
-        const { auth, createUserWithEmailAndPassword, sendEmailVerification } = window.firebaseExports;
-        const userCred = await createUserWithEmailAndPassword(auth, form.email, form.password);
-        await sendEmailVerification(userCred.user);
-        initPhoneVerification();
-      };
+    const { auth, createUserWithEmailAndPassword, sendEmailVerification } = window.firebaseExports;
 
-      const initPhoneVerification = () => {
-        const { auth, RecaptchaVerifier, signInWithPhoneNumber } = window.firebaseExports;
-        window.recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', { size: 'normal' }, auth);
-        signInWithPhoneNumber(auth, "+27" + form.cellphone.replace(/^0/, ""), window.recaptchaVerifier)
-          .then(result => { setConfirmationResult(result); setStep("otp"); });
-      };
+    try {
+      setLoading(true);
+      const userCred = await createUserWithEmailAndPassword(auth, form.email, form.password);
+      await sendEmailVerification(userCred.user);
+      alert("Email sent for verification. Proceed to verify your cellphone.");
+      initPhoneVerification();
+    } catch (error) {
+      if (error.code === "auth/email-already-in-use") {
+        alert("This email is already registered. Please login or use a different email.");
+      } else if (error.code === "auth/invalid-email") {
+        alert("Invalid email address. Please enter a valid email.");
+      } else if (error.code === "auth/weak-password") {
+        alert("Password is too weak. Use at least 6 characters.");
+      } else {
+        alert("Error: " + error.message);
+      }
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-      const verifyOtp = async () => {
-        await confirmationResult.confirm(form.otp);
-        alert("Account verified successfully");
-        window.location.href = "login.html";
-      };
+  const initPhoneVerification = () => {
+    const { auth, RecaptchaVerifier, signInWithPhoneNumber } = window.firebaseExports;
+    window.recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', { size: 'normal' }, auth);
 
+    signInWithPhoneNumber(auth, "+27" + form.cellphone.replace(/^0/, ""), window.recaptchaVerifier)
+      .then(result => { setConfirmationResult(result); setStep("otp"); })
+      .catch(err => { alert("Phone verification error: " + err.message); console.error(err); });
+  };
+
+  const verifyOtp = async () => {
+    if (!form.otp) { alert("Please enter the OTP sent to your phone."); return; }
+    try {
+      await confirmationResult.confirm(form.otp);
+      alert("Account verified successfully");
+      window.location.href = "login.html";
+    } catch (err) {
+      alert("OTP verification failed: " + err.message);
+      console.error(err);
+    }
+  };
       return (
         <div className="card">
           <div className="logo">ReZa</div>
