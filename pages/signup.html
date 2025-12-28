@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>ReZa | Create Account</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0b5d3b" />
+  <meta name="description" content="Create your ReZa secure e-wallet account." />
+
+  <!-- React -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, sendEmailVerification, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
+
+    window.firebaseExports = {};
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAWUXQs1W0IBT2J27eEllfT8jPtZD6Fx20",
+      authDomain: "re-el-eed0d.firebaseapp.com",
+      databaseURL: "https://re-el-eed0d-default-rtdb.firebaseio.com",
+      projectId: "re-el-eed0d",
+      storageBucket: "re-el-eed0d.appspot.com",
+      messagingSenderId: "676690470943",
+      appId: "1:676690470943:web:482a707b370383369ecd2a",
+      measurementId: "G-WS35RTNEBP"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    getAnalytics(app);
+
+    window.firebaseExports.auth = auth;
+    window.firebaseExports.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
+    window.firebaseExports.sendEmailVerification = sendEmailVerification;
+    window.firebaseExports.RecaptchaVerifier = RecaptchaVerifier;
+    window.firebaseExports.signInWithPhoneNumber = signInWithPhoneNumber;
+  </script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: radial-gradient(circle at top, #0b5d3b, #0a1a2f);
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 440px;
+      background: rgba(255,255,255,0.06);
+      padding: 32px;
+      border-radius: 18px;
+      border: 1px solid rgba(212,175,55,0.35);
+      box-shadow: 0 0 30px rgba(212,175,55,0.15);
+      animation: fadeIn 1.1s ease;
+    }
+
+    .logo {
+      text-align: center;
+      font-size: 2.4rem;
+      font-weight: 900;
+      color: #d4af37;
+      margin-bottom: 8px;
+      animation: float 6s ease-in-out infinite;
+    }
+
+    .subtitle {
+      text-align: center;
+      opacity: 0.8;
+      margin-bottom: 20px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 10px;
+      border-radius: 10px;
+      border: none;
+      outline: none;
+      font-size: 0.95rem;
+    }
+
+    .checkbox {
+      font-size: 0.8rem;
+      margin: 10px 0;
+    }
+
+    .checkbox a {
+      color: #d4af37;
+      text-decoration: none;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 14px;
+      border-radius: 10px;
+      border: none;
+      background: #d4af37;
+      color: #0a1a2f;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .links {
+      margin-top: 16px;
+      font-size: 0.8rem;
+      text-align: center;
+    }
+
+    .links a {
+      color: #d4af37;
+      text-decoration: none;
+    }
+
+    #recaptcha-container {
+      margin-top: 12px;
+    }
+
+    @keyframes float {
+      0%,100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    function Signup() {
+      const [form, setForm] = React.useState({});
+      const [step, setStep] = React.useState("signup");
+      const [confirmationResult, setConfirmationResult] = React.useState(null);
+
+      const handleChange = e =>
+        setForm({ ...form, [e.target.name]: e.target.value });
+
+      const register = async () => {
+        if (form.password !== form.confirmPassword) {
+          alert("Passwords do not match");
+          return;
+        }
+
+        const { auth, createUserWithEmailAndPassword, sendEmailVerification } = window.firebaseExports;
+
+        const userCred = await createUserWithEmailAndPassword(auth, form.email, form.password);
+        await sendEmailVerification(userCred.user);
+
+        initPhoneVerification();
+      };
+
+      const initPhoneVerification = () => {
+        const { auth, RecaptchaVerifier, signInWithPhoneNumber } = window.firebaseExports;
+
+        window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+          size: 'normal'
+        });
+
+        signInWithPhoneNumber(auth, "+27" + form.cellphone.replace(/^0/, ""), window.recaptchaVerifier)
+          .then(result => {
+            setConfirmationResult(result);
+            setStep("otp");
+          });
+      };
+
+      const verifyOtp = async () => {
+        await confirmationResult.confirm(form.otp);
+        alert("Account verified successfully");
+        window.location.href = "login.html";
+      };
+
+      return (
+        <div className="card">
+          <div className="logo">ReZa</div>
+          <div className="subtitle">Create Secure Wallet Account</div>
+
+          {step === "signup" && (
+            <>
+              <input name="name" placeholder="First Name" onChange={handleChange} />
+              <input name="surname" placeholder="Surname" onChange={handleChange} />
+              <input name="id" placeholder="ID Number" onChange={handleChange} />
+              <input name="cellphone" placeholder="Cellphone (0XXXXXXXXX)" onChange={handleChange} />
+              <input name="email" type="email" placeholder="Email" onChange={handleChange} />
+              <input name="password" type="password" placeholder="Password" onChange={handleChange} />
+              <input name="confirmPassword" type="password" placeholder="Confirm Password" onChange={handleChange} />
+
+              <div className="checkbox">
+                <input type="checkbox" required /> I agree to
+                <a href="pages/terms-and-conditions.html"> Terms</a> &
+                <a href="pages/privacy-policy.html"> Privacy Policy</a>
+              </div>
+
+              <button className="btn" onClick={register}>Create Account</button>
+
+              <div className="links">
+                <a href="login.html">Already have an account?</a> •
+                <a href="forgot-password.html"> Forgot password</a>
+              </div>
+
+              <div id="recaptcha-container"></div>
+            </>
+          )}
+
+          {step === "otp" && (
+            <>
+              <input name="otp" placeholder="Enter OTP" onChange={handleChange} />
+              <button className="btn" onClick={verifyOtp}>Verify Cellphone</button>
+            </>
+          )}
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<Signup />);
+  </script>
+</body>
+</html>
