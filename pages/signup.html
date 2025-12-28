@@ -16,7 +16,13 @@
   <!-- Firebase -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, sendEmailVerification, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import {
+      getAuth,
+      createUserWithEmailAndPassword,
+      sendEmailVerification,
+      RecaptchaVerifier,
+      signInWithPhoneNumber
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
 
     window.firebaseExports = {};
@@ -162,26 +168,43 @@
           return;
         }
 
-        const { auth, createUserWithEmailAndPassword, sendEmailVerification } = window.firebaseExports;
+        const {
+          auth,
+          createUserWithEmailAndPassword,
+          sendEmailVerification
+        } = window.firebaseExports;
 
-        const userCred = await createUserWithEmailAndPassword(auth, form.email, form.password);
+        const userCred = await createUserWithEmailAndPassword(
+          auth,
+          form.email,
+          form.password
+        );
+
         await sendEmailVerification(userCred.user);
-
         initPhoneVerification();
       };
 
       const initPhoneVerification = () => {
-        const { auth, RecaptchaVerifier, signInWithPhoneNumber } = window.firebaseExports;
+        const {
+          auth,
+          RecaptchaVerifier,
+          signInWithPhoneNumber
+        } = window.firebaseExports;
 
-        window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-          size: 'normal'
+        window.recaptchaVerifier = new RecaptchaVerifier(
+          'recaptcha-container',
+          { size: 'normal' },
+          auth
+        );
+
+        signInWithPhoneNumber(
+          auth,
+          "+27" + form.cellphone.replace(/^0/, ""),
+          window.recaptchaVerifier
+        ).then(result => {
+          setConfirmationResult(result);
+          setStep("otp");
         });
-
-        signInWithPhoneNumber(auth, "+27" + form.cellphone.replace(/^0/, ""), window.recaptchaVerifier)
-          .then(result => {
-            setConfirmationResult(result);
-            setStep("otp");
-          });
       };
 
       const verifyOtp = async () => {
@@ -196,39 +219,41 @@
           <div className="subtitle">Create Secure Wallet Account</div>
 
           {step === "signup" && (
+            <React.Fragment>
+              <input name="name" placeholder="First Name" onChange={handleChange} />
+              <input name="surname" placeholder="Surname" onChange={handleChange} />
+              <input name="id" placeholder="ID Number" onChange={handleChange} />
+              <input name="cellphone" placeholder="Cellphone (0XXXXXXXXX)" onChange={handleChange} />
+              <input name="email" type="email" placeholder="Email" onChange={handleChange} />
+              <input name="password" type="password" placeholder="Password" onChange={handleChange} />
+              <input name="confirmPassword" type="password" placeholder="Confirm Password" onChange={handleChange} />
 
-          <React.Fragment>
-    <input name="name" placeholder="First Name" onChange={handleChange} />
-    <input name="surname" placeholder="Surname" onChange={handleChange} />
-    <input name="id" placeholder="ID Number" onChange={handleChange} />
-    <input name="cellphone" placeholder="Cellphone (0XXXXXXXXX)" onChange={handleChange} />
-    <input name="email" type="email" placeholder="Email" onChange={handleChange} />
-    <input name="password" type="password" placeholder="Password" onChange={handleChange} />
-    <input name="confirmPassword" type="password" placeholder="Confirm Password" onChange={handleChange} />
+              <div className="checkbox">
+                <input type="checkbox" required /> I agree to
+                <a href="pages/terms-and-conditions.html"> Terms</a> &
+                <a href="pages/privacy-policy.html"> Privacy Policy</a>
+              </div>
 
-    <div className="checkbox">
-      <input type="checkbox" required /> I agree to
-      <a href="pages/terms-and-conditions.html"> Terms</a> &
-      <a href="pages/privacy-policy.html"> Privacy Policy</a>
-    </div>
+              <button className="btn" onClick={register}>
+                Create Account
+              </button>
 
-    <button className="btn" onClick={register}>Create Account</button>
+              <div className="links">
+                <a href="login.html">Already have an account?</a> •
+                <a href="forgot-password.html"> Forgot password</a>
+              </div>
 
-    <div className="links">
-      <a href="login.html">Already have an account?</a> •
-      <a href="forgot-password.html"> Forgot password</a>
-    </div>
-
-    <div id="recaptcha-container"></div>
-  </React.Fragment>
-)}
-
+              <div id="recaptcha-container"></div>
+            </React.Fragment>
+          )}
 
           {step === "otp" && (
-            <>
+            <React.Fragment>
               <input name="otp" placeholder="Enter OTP" onChange={handleChange} />
-              <button className="btn" onClick={verifyOtp}>Verify Cellphone</button>
-            </>
+              <button className="btn" onClick={verifyOtp}>
+                Verify Cellphone
+              </button>
+            </React.Fragment>
           )}
         </div>
       );
