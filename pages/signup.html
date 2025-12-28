@@ -50,11 +50,7 @@
   </script>
 
   <style>
-    * {
-      box-sizing: border-box;
-      font-family: 'Segoe UI', system-ui, sans-serif;
-    }
-
+    * { box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
     body {
       margin: 0;
       background: radial-gradient(circle at top, #0b5d3b, #0a1a2f);
@@ -85,11 +81,7 @@
       animation: float 6s ease-in-out infinite;
     }
 
-    .subtitle {
-      text-align: center;
-      opacity: 0.8;
-      margin-bottom: 20px;
-    }
+    .subtitle { text-align: center; opacity: 0.8; margin-bottom: 20px; }
 
     input {
       width: 100%;
@@ -106,10 +98,14 @@
       margin: 10px 0;
     }
 
-    .checkbox a {
-      color: #d4af37;
-      text-decoration: none;
+    .checkbox label {
+      color: #fff;
+      display: block;
+      margin-bottom: 4px;
+      cursor: pointer;
     }
+
+    .checkbox a { color: #d4af37; text-decoration: none; }
 
     .btn {
       width: 100%;
@@ -121,32 +117,26 @@
       font-weight: 700;
       cursor: pointer;
       margin-top: 10px;
+      transition: transform 0.2s, box-shadow 0.2s;
     }
 
-    .links {
-      margin-top: 16px;
-      font-size: 0.8rem;
-      text-align: center;
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(212,175,55,0.4);
     }
 
-    .links a {
-      color: #d4af37;
-      text-decoration: none;
+    .btn:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 6px rgba(212,175,55,0.3);
     }
 
-    #recaptcha-container {
-      margin-top: 12px;
-    }
+    .links { margin-top: 16px; font-size: 0.8rem; text-align: center; }
+    .links a { color: #d4af37; text-decoration: none; }
 
-    @keyframes float {
-      0%,100% { transform: translateY(0); }
-      50% { transform: translateY(-6px); }
-    }
+    #recaptcha-container { margin-top: 12px; }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
   </style>
 </head>
 
@@ -158,53 +148,34 @@
       const [form, setForm] = React.useState({});
       const [step, setStep] = React.useState("signup");
       const [confirmationResult, setConfirmationResult] = React.useState(null);
+      const [agreeTerms, setAgreeTerms] = React.useState(false);
+      const [agreePrivacy, setAgreePrivacy] = React.useState(false);
 
       const handleChange = e =>
         setForm({ ...form, [e.target.name]: e.target.value });
 
+      const handleTerms = () => setAgreeTerms(!agreeTerms);
+      const handlePrivacy = () => setAgreePrivacy(!agreePrivacy);
+
       const register = async () => {
+        if (!agreeTerms) { alert("You must agree to the Terms."); return; }
+        if (!agreePrivacy) { alert("You must agree to the Privacy Policy."); return; }
         if (form.password !== form.confirmPassword) {
           alert("Passwords do not match");
           return;
         }
 
-        const {
-          auth,
-          createUserWithEmailAndPassword,
-          sendEmailVerification
-        } = window.firebaseExports;
-
-        const userCred = await createUserWithEmailAndPassword(
-          auth,
-          form.email,
-          form.password
-        );
-
+        const { auth, createUserWithEmailAndPassword, sendEmailVerification } = window.firebaseExports;
+        const userCred = await createUserWithEmailAndPassword(auth, form.email, form.password);
         await sendEmailVerification(userCred.user);
         initPhoneVerification();
       };
 
       const initPhoneVerification = () => {
-        const {
-          auth,
-          RecaptchaVerifier,
-          signInWithPhoneNumber
-        } = window.firebaseExports;
-
-        window.recaptchaVerifier = new RecaptchaVerifier(
-          'recaptcha-container',
-          { size: 'normal' },
-          auth
-        );
-
-        signInWithPhoneNumber(
-          auth,
-          "+27" + form.cellphone.replace(/^0/, ""),
-          window.recaptchaVerifier
-        ).then(result => {
-          setConfirmationResult(result);
-          setStep("otp");
-        });
+        const { auth, RecaptchaVerifier, signInWithPhoneNumber } = window.firebaseExports;
+        window.recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', { size: 'normal' }, auth);
+        signInWithPhoneNumber(auth, "+27" + form.cellphone.replace(/^0/, ""), window.recaptchaVerifier)
+          .then(result => { setConfirmationResult(result); setStep("otp"); });
       };
 
       const verifyOtp = async () => {
@@ -229,14 +200,17 @@
               <input name="confirmPassword" type="password" placeholder="Confirm Password" onChange={handleChange} />
 
               <div className="checkbox">
-                <input type="checkbox" required /> I agree to
-                <a href="pages/terms-and-conditions.html"> Terms</a> &
-                <a href="pages/privacy-policy.html"> Privacy Policy</a>
+                <label>
+                  <input type="checkbox" checked={agreeTerms} onChange={handleTerms} /> I agree to
+                  <a href="pages/terms-and-conditions.html"> Terms</a>
+                </label>
+                <label>
+                  <input type="checkbox" checked={agreePrivacy} onChange={handlePrivacy} /> I agree to
+                  <a href="pages/privacy-policy.html"> Privacy Policy</a>
+                </label>
               </div>
 
-              <button className="btn" onClick={register}>
-                Create Account
-              </button>
+              <button className="btn" onClick={register}>Create Account</button>
 
               <div className="links">
                 <a href="login.html">Already have an account?</a> •
@@ -250,9 +224,7 @@
           {step === "otp" && (
             <React.Fragment>
               <input name="otp" placeholder="Enter OTP" onChange={handleChange} />
-              <button className="btn" onClick={verifyOtp}>
-                Verify Cellphone
-              </button>
+              <button className="btn" onClick={verifyOtp}>Verify Cellphone</button>
             </React.Fragment>
           )}
         </div>
