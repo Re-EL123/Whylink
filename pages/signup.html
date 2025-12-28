@@ -196,31 +196,33 @@
           <div className="subtitle">Create Secure Wallet Account</div>
 
           {step === "signup" && (
-            <>
-              <input name="name" placeholder="First Name" onChange={handleChange} />
-              <input name="surname" placeholder="Surname" onChange={handleChange} />
-              <input name="id" placeholder="ID Number" onChange={handleChange} />
-              <input name="cellphone" placeholder="Cellphone (0XXXXXXXXX)" onChange={handleChange} />
-              <input name="email" type="email" placeholder="Email" onChange={handleChange} />
-              <input name="password" type="password" placeholder="Password" onChange={handleChange} />
-              <input name="confirmPassword" type="password" placeholder="Confirm Password" onChange={handleChange} />
 
-              <div className="checkbox">
-                <input type="checkbox" required /> I agree to
-                <a href="pages/terms-and-conditions.html"> Terms</a> &
-                <a href="pages/privacy-policy.html"> Privacy Policy</a>
-              </div>
+          <React.Fragment>
+    <input name="name" placeholder="First Name" onChange={handleChange} />
+    <input name="surname" placeholder="Surname" onChange={handleChange} />
+    <input name="id" placeholder="ID Number" onChange={handleChange} />
+    <input name="cellphone" placeholder="Cellphone (0XXXXXXXXX)" onChange={handleChange} />
+    <input name="email" type="email" placeholder="Email" onChange={handleChange} />
+    <input name="password" type="password" placeholder="Password" onChange={handleChange} />
+    <input name="confirmPassword" type="password" placeholder="Confirm Password" onChange={handleChange} />
 
-              <button className="btn" onClick={register}>Create Account</button>
+    <div className="checkbox">
+      <input type="checkbox" required /> I agree to
+      <a href="pages/terms-and-conditions.html"> Terms</a> &
+      <a href="pages/privacy-policy.html"> Privacy Policy</a>
+    </div>
 
-              <div className="links">
-                <a href="login.html">Already have an account?</a> •
-                <a href="forgot-password.html"> Forgot password</a>
-              </div>
+    <button className="btn" onClick={register}>Create Account</button>
 
-              <div id="recaptcha-container"></div>
-            </>
-          )}
+    <div className="links">
+      <a href="login.html">Already have an account?</a> •
+      <a href="forgot-password.html"> Forgot password</a>
+    </div>
+
+    <div id="recaptcha-container"></div>
+  </React.Fragment>
+)}
+
 
           {step === "otp" && (
             <>
