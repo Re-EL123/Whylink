@@ -2,19 +2,18 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>B Re-EL | Secure E-Wallet</title>
+  <title>ReZa | Secure E-Wallet</title>
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#0b5d3b" />
-  <meta name="description" content="B Re-EL Secure E-Wallet for South Africa. Deposit, withdraw and manage your money safely." />
+  <meta name="description" content="ReZa Secure E-Wallet for South Africa. Powered by Re-EL." />
 
-  <!-- PWA -->
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="icon-192.png" />
 
-  <!-- React CDN -->
-  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <!-- React -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
 
   <style>
@@ -25,12 +24,13 @@
 
     body {
       margin: 0;
-      background: linear-gradient(135deg, #0a1a2f, #0b5d3b);
-      color: #ffffff;
+      background: radial-gradient(circle at top, #0b5d3b, #0a1a2f);
+      color: #fff;
       min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
+      overflow: hidden;
     }
 
     .splash {
@@ -41,24 +41,26 @@
     }
 
     .logo {
-      font-size: 2.6rem;
-      font-weight: 800;
+      font-size: 2.8rem;
+      font-weight: 900;
       color: #d4af37;
       letter-spacing: 1px;
+      animation: float 6s ease-in-out infinite;
     }
 
     .subtitle {
-      margin-top: 12px;
-      font-size: 1rem;
-      opacity: 0.9;
+      margin-top: 10px;
+      opacity: 0.85;
     }
 
     .balance-preview {
-      margin: 30px 0;
+      margin: 32px 0;
+      padding: 20px;
+      border-radius: 16px;
       background: rgba(255, 255, 255, 0.08);
-      padding: 18px;
-      border-radius: 14px;
-      border: 1px solid rgba(212, 175, 55, 0.35);
+      border: 1px solid rgba(212, 175, 55, 0.4);
+      box-shadow: 0 0 25px rgba(212, 175, 55, 0.15);
+      animation: glow 4s ease-in-out infinite;
     }
 
     .balance-label {
@@ -67,8 +69,8 @@
     }
 
     .balance-amount {
-      font-size: 1.8rem;
-      font-weight: bold;
+      font-size: 1.9rem;
+      font-weight: 700;
       margin-top: 6px;
       color: #d4af37;
     }
@@ -82,7 +84,7 @@
       font-size: 1rem;
       font-weight: 600;
       cursor: pointer;
-      transition: transform 0.2s ease, opacity 0.2s ease;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
     }
 
     .btn-primary {
@@ -92,30 +94,34 @@
 
     .btn-secondary {
       background: transparent;
-      color: #ffffff;
+      color: #fff;
       border: 1px solid #d4af37;
     }
 
     .btn:hover {
-      transform: translateY(-2px);
-      opacity: 0.95;
+      transform: translateY(-3px);
+      box-shadow: 0 10px 20px rgba(212,175,55,0.25);
     }
 
     .footer-text {
-      margin-top: 30px;
+      margin-top: 28px;
       font-size: 0.75rem;
-      opacity: 0.65;
+      opacity: 0.6;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    @keyframes glow {
+      0%, 100% { box-shadow: 0 0 18px rgba(212,175,55,0.2); }
+      50% { box-shadow: 0 0 32px rgba(212,175,55,0.4); }
     }
 
     @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
@@ -123,37 +129,28 @@
 <body>
   <div id="root"></div>
 
-  <!-- React App -->
   <script type="text/babel">
     function App() {
       return (
         <div className="splash">
-          <div className="logo">B Re-EL</div>
-          <div className="subtitle">
-            Secure South African E-Wallet
-          </div>
+          <div className="logo">ReZa</div>
+          <div className="subtitle">Secure South African E-Wallet</div>
 
           <div className="balance-preview">
             <div className="balance-label">Wallet Balance</div>
             <div className="balance-amount">R0.00</div>
           </div>
 
-          <button
-            className="btn btn-primary"
-            onClick={() => window.location.href = "signup.html"}
-          >
+          <button className="btn btn-primary" onClick={() => location.href='signup.html'}>
             Create Account
           </button>
 
-          <button
-            className="btn btn-secondary"
-            onClick={() => window.location.href = "login.html"}
-          >
+          <button className="btn btn-secondary" onClick={() => location.href='login.html'}>
             Login to Wallet
           </button>
 
           <div className="footer-text">
-            Protected • Trusted • Powered for South Africa 🇿🇦
+            Powered by Re-EL • Built for ZA 🇿🇦
           </div>
         </div>
       );
@@ -162,12 +159,9 @@
     ReactDOM.createRoot(document.getElementById("root")).render(<App />);
   </script>
 
-  <!-- Service Worker -->
   <script>
     if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('service-worker.js');
-      });
+      navigator.serviceWorker.register('service-worker.js');
     }
   </script>
 </body>
